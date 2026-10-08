@@ -16,20 +16,20 @@ export enum TaskResult {
     WAITING
 }
 
-export class BaseTask {
-
-}
+export class BaseTask {}
 export class PrimitiveTask extends BaseTask {
     private preconditions: Condition[] = [];
     private effects: Condition[] = [];
-    constructor(preconditions: Condition[], effects: Condition[]) {
+    private onExecute: () => TaskResult;
+    constructor(preconditions: Condition[], effects: Condition[], onExecute: () =>TaskResult) {
         super();
         this.preconditions = preconditions;
         this.effects = effects;
+        this.onExecute = onExecute;
     }
     IsAvailable(worldState: WorldState): boolean { return worldState.CheckConditions(this.preconditions); }
     ApplyEffects(worldState: WorldState) { worldState.UpdateWorldState(this.effects); }
-    Execute(): TaskResult { return TaskResult.SUCCESS }
+    Execute(): TaskResult { return this.onExecute();}
     GetPreconditions(): Condition[] { return this.preconditions }
 }
 

@@ -5,7 +5,8 @@ export type Condition = {
 
 export enum eCondition {
     vTargetLocation,
-    bSeesTarget
+    bSeesTarget,
+    bTestValue
 }
 
 export class WorldState {
