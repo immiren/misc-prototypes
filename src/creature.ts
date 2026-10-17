@@ -9,9 +9,9 @@ export class Creature {
     public worldState: WorldState;
     public plan: PrimitiveTask[] = [];
     constructor(rootTask: CompoundTask) {
-        this.planner = new Planner(rootTask);
-        this.planRunner = new PlanRunner();
         this.worldState = new WorldState();
+        this.planner = new Planner(rootTask, this.worldState);
+        this.planRunner = new PlanRunner();
     }
     
 }

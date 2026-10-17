@@ -13,14 +13,36 @@ export type ConditionValue =
     | (number | string)[]
     | null;
 
+// pahoin pelkään et tää ei toimi niin ku toivoin. testaile
 export type Condition = {
     [K in eCondition]: { key: K; value: ConditionValue }
 }[eCondition]
 
+// erm figure out missä aktiivine ws ja kopiot on,,, 
 export class WorldState {
     private conditions: Condition[] = [];
+    constructor(facts?: Condition[]){
+        this.conditions = [
+            {
+                key: eCondition.bSeesTarget,
+                value: facts ? facts[eCondition.bSeesTarget].value : false
+            },
+            {
+                key: eCondition.bTestValue,
+                value: facts ? facts[eCondition.bTestValue].value : false
+            },
+            {
+                key: eCondition.vTargetLocation,
+                value: facts ? facts[eCondition.vTargetLocation].value : null
+            }
+        ];
+        LOGGER.logDev('constructing ws');
+        this.conditions.forEach((c) => {
+            LOGGER.logDev(c.key + ': ' + c.value);
+        })
+    }
     CheckConditions(preconditions: Condition[]): boolean {
-        for ( const precondition of preconditions) {
+        for (const precondition of preconditions) {
             LOGGER.logDev('Checking if ' + precondition.key + ' is ' + precondition.value);
             const condition = this.conditions[precondition.key];
             LOGGER.logDev('Condition ' + condition.key + ' is ' + condition.value);
@@ -47,22 +69,13 @@ export class WorldState {
         }
     }
     GetWorldState(): Condition[] { return this.conditions; }
-    GetCopyOfWorldState() { }
+    GetCopyOfWorldState(): WorldState {
+        LOGGER.logDev('Copying WS');
+        const ws = new WorldState();
+        ws.UpdateWorldState(this.conditions);
+        return ws;
+    }
     SetupWorldState() {
-        this.conditions = [
-            {
-                key: eCondition.bSeesTarget,
-                value: false
-            },
-            {
-                key: eCondition.bTestValue,
-                value: false
-            },
-            {
-                key: eCondition.vTargetLocation,
-                value: null
-            }
-        ];
     }
     GetValue(fact: Condition): Condition | undefined {
         return;

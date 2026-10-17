@@ -9,9 +9,16 @@ export class PlanRunner {
     ExecutePlan(plan: PrimitiveTask[], worldState: WorldState) {
         console.log('plan len ' + plan.length);
         for(const task of plan) {
-            if (worldState.CheckConditions(task.GetPreconditions())) task.Execute();
-            else {
-                LOGGER.logDev('Plan failed at task ' + task.name);
+            if (worldState.CheckConditions(task.GetPreconditions())) {
+                const result = task.Execute();
+                if(result === TaskResult.SUCCESS) task.ApplyEffects(worldState);
+                else if (result === TaskResult.FAILURE) {
+                    LOGGER.logDev('Failed task ' + task.name);
+                    // this.ClearPlan(); // tarviiks tätä ees? missä plan säilytetää
+                    return;
+                }
+            } else {
+                LOGGER.logDev('Conditions unmet at task ' + task.name);
                 return;
             }
         }

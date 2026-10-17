@@ -33,6 +33,7 @@ export class PrimitiveTask extends BaseTask {
         this.onExecute = onExecute;
     }
     IsAvailable(worldState: WorldState): boolean { return worldState.CheckConditions(this.preconditions); }
+    // huom: applyeffects, pitäiskö tämmöstä ees olla oikeesti? tai tää oli planning exclusive funktio
     ApplyEffects(worldState: WorldState) { worldState.UpdateWorldState(this.effects); }
     Execute(): TaskResult { 
         LOGGER.logDev('Executing task ' + this.name);

@@ -1,7 +1,6 @@
 import { Creature } from "./creature";
 import { domain } from "./HTN Planning/domain";
-import { CompoundTask, PrimitiveTask, TaskResult } from "./HTN Planning/tasks";
-import { eCondition, WorldState } from "./HTN Planning/worldState";
+import { WorldState } from "./HTN Planning/worldState";
 import { Logger } from "./logger";
 
 export const LOGGER = new Logger();
@@ -24,16 +23,16 @@ function setup() {
   // mitä tapahtuu kun hahmo luodaan?
   // tarttee ws ja domain
   const creature = new Creature(domain());
-  const activeWorldState = new WorldState();
-  activeWorldState.SetupWorldState();
   const plan = creature.planner.Plan(creature.worldState);
   console.log('plan length ' + plan.length);
   if (plan.length > 0) creature.plan = plan;
-  creature.planRunner.ExecutePlan(plan, activeWorldState);
+  creature.planRunner.ExecutePlan(plan, creature.worldState);
   setInterval(() => {
     const newPlan = creature.planner.Plan(creature.worldState);
     if (plan.length > 0) creature.plan = newPlan;
-    creature.planRunner.ExecutePlan(newPlan, activeWorldState);
+    creature.planRunner.ExecutePlan(newPlan, creature.worldState);
+    creature.worldState.GetCopyOfWorldState();
+
   }, 10000);
   // update world state
   // request plan

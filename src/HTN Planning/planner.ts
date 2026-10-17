@@ -6,9 +6,9 @@ export class Planner {
     private worldStateStack: WorldState[] = [];
     private activeWorldState: WorldState;
     private rootTask: CompoundTask; // tän ei ehk pitäis olla tääl. onks planner npc-spesifi vai ei?
-    constructor(rootTask: CompoundTask) {
+    constructor(rootTask: CompoundTask, worldState: WorldState) {
         this.rootTask = rootTask;
-        this.activeWorldState = new WorldState();
+        this.activeWorldState = worldState;
     }
     Plan(worldState: WorldState): PrimitiveTask[] {
         this.InitialiseCurrentWorkingState(worldState);
