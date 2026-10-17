@@ -1,3 +1,4 @@
+// export type Condition = {eCondition: boolean | number | string | (number | string)[]} 
 export type Condition = {
     name: eCondition,
     value: boolean | number | string | (number | string)[] //etc
