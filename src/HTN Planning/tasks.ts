@@ -8,6 +8,7 @@
 //     }
 // }
 
+import { LOGGER } from "..";
 import { Condition, WorldState } from "./worldState";
 
 export enum TaskResult {
@@ -18,18 +19,26 @@ export enum TaskResult {
 
 export class BaseTask {}
 export class PrimitiveTask extends BaseTask {
+    public readonly name: string;
     private preconditions: Condition[] = [];
     private effects: Condition[] = [];
     private onExecute: () => TaskResult;
-    constructor(preconditions: Condition[], effects: Condition[], onExecute: () =>TaskResult) {
+    private message: string;
+    constructor(name: string, preconditions: Condition[], effects: Condition[], message: string, onExecute: () =>TaskResult) {
         super();
+        this.name = name;
         this.preconditions = preconditions;
         this.effects = effects;
+        this.message = message;
         this.onExecute = onExecute;
     }
     IsAvailable(worldState: WorldState): boolean { return worldState.CheckConditions(this.preconditions); }
     ApplyEffects(worldState: WorldState) { worldState.UpdateWorldState(this.effects); }
-    Execute(): TaskResult { return this.onExecute();}
+    Execute(): TaskResult { 
+        LOGGER.logDev('Executing task ' + this.name);
+        LOGGER.logTask(this.message);
+        return this.onExecute();
+    }
     GetPreconditions(): Condition[] { return this.preconditions }
 }
 

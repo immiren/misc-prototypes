@@ -1,8 +1,4 @@
-// export type Condition = {eCondition: boolean | number | string | (number | string)[]} 
-export type Condition = {
-    name: eCondition,
-    value: boolean | number | string | (number | string)[] //etc
-}
+import { LOGGER } from "..";
 
 export enum eCondition {
     vTargetLocation,
@@ -10,19 +6,64 @@ export enum eCondition {
     bTestValue
 }
 
+export type ConditionValue =
+    | boolean
+    | number
+    | string
+    | (number | string)[]
+    | null;
+
+export type Condition = {
+    [K in eCondition]: { key: K; value: ConditionValue }
+}[eCondition]
+
 export class WorldState {
     private conditions: Condition[] = [];
-    CheckConditions(preconditions: Condition[]): boolean { return true; }
+    CheckConditions(preconditions: Condition[]): boolean {
+        for ( const precondition of preconditions) {
+            LOGGER.logDev('Checking if ' + precondition.key + ' is ' + precondition.value);
+            const condition = this.conditions[precondition.key];
+            LOGGER.logDev('Condition ' + condition.key + ' is ' + condition.value);
+            if (!condition) {
+                LOGGER.logDev('Precondition ' + precondition.key + ' not found/unmet.');
+                return false;
+            }
+            LOGGER.logDev('Precondition ' + precondition.key + ' met.');
+        }
+        LOGGER.logDev('All ' + preconditions.length + ' conditions met.');
+        return true; }
     UpdateWorldState(facts: Condition[]) {
-        facts.forEach((fact) => {
-            // if (this.conditions.includes(fact)) { }
-            console.log('Updating ' + fact);
-            //  + ' from ' + this.conditions.find(key))
-        })
+        for (const fact of facts) {
+            const condition = this.conditions[fact.key];
+            if (!condition) {
+                LOGGER.logDev('Condition ' + fact.key + ' not found in world state');
+                continue;
+            }
+
+            LOGGER.logDev('Updating ' + fact.key + ' from ' + condition.value + ' to ' + fact.value);
+            // shallow copy: world state ei varmana päivity :(
+            this.conditions[fact.key] = fact;
+            // TODO html update
+        }
     }
-    GetWorldState(): Condition[] { return []; }
+    GetWorldState(): Condition[] { return this.conditions; }
     GetCopyOfWorldState() { }
-    SetupWorldState() { }
+    SetupWorldState() {
+        this.conditions = [
+            {
+                key: eCondition.bSeesTarget,
+                value: false
+            },
+            {
+                key: eCondition.bTestValue,
+                value: false
+            },
+            {
+                key: eCondition.vTargetLocation,
+                value: null
+            }
+        ];
+    }
     GetValue(fact: Condition): Condition | undefined {
         return;
     }
