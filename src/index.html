@@ -9,10 +9,20 @@
 <body>
     <div class="container">
         <h1 id="header">Test</h1>
-        <p id="1">Player actions</p>
-        <p id="2">NPC's behavior log</p>
-        <p id="4">Log: </p>
-        <p id="3"></p>
+        <div style="display: flex; height: 100%;">
+            <div style="border: solid 1px white; width: 30%; margin: 3px; padding-left: 1em">
+                <p>Dev log: </p>
+                <p id="devLog"></p>
+            </div>
+            <div style="border: solid 1px white; width: 50%; margin: 3px; padding-left: 1em">
+                <p>Task log: </p>
+                <p id="taskLog"></p>
+            </div>
+            <div style="border: solid 1px white; width: 20%; margin: 3px; padding-left: 1em">
+                <p>World state: </p>
+                <p>Fake entry 1</p>
+            </div>
+        </div>
     </div>
     <script type="module" src="../dist/bundle.js" crossorigin="anonymous"></script>
 </body>
