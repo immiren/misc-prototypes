@@ -1,24 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%;">
 
 <head>
     <title>HTNP prototype</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body style="height: 100%;">
     <div class="container">
         <h1 id="header">Test</h1>
-        <div style="display: flex; height: 100%;">
-            <div style="border: solid 1px white; width: 30%; margin: 3px; padding-left: 1em">
-                <p>Dev log: </p>
-                <p id="devLog"></p>
+        <div style="max-height:max-content; display: grid; grid-template-columns: 30% 40% 30%; min-height:100vh;">
+            <div >
+                <div style="border: solid 1px white; margin: 3px; padding-left: 1em; ">
+                    <p>Settings here</p>
+                </div>
+                <div style="overflow-y:scroll; border: solid 1px white; margin: 3px; padding-left: 1em; ">
+                    <p>Dev log: </p>
+                    <p id="devLog"></p>
+                </div>
             </div>
-            <div style="border: solid 1px white; width: 50%; margin: 3px; padding-left: 1em">
+            <div style="overflow-y:scroll; border: solid 1px white; margin: 3px; padding-left: 1em">
                 <p>Task log: </p>
                 <p id="taskLog"></p>
             </div>
-            <div style="border: solid 1px white; width: 20%; margin: 3px; padding-left: 1em">
+            <div style="border: solid 1px white; margin: 3px; padding-left: 1em">
                 <p>World state: </p>
                 <p>Fake entry 1</p>
             </div>
