@@ -21,6 +21,10 @@ export type Condition = {
 // erm figure out missä aktiivine ws ja kopiot on,,, 
 export class WorldState {
     private conditions: Condition[] = [];
+    private elements: {
+        index: number,
+        elements: HTMLElement[]
+    }[] = [];
     constructor(facts?: Condition[]){
         // HUOM janky. varmista et nää on järjestyksessä,,,,,,
         this.conditions = [
@@ -74,6 +78,7 @@ export class WorldState {
     GetCopyOfWorldState(): WorldState {
         LOGGER.logDev('Copying WS');
         const ws = new WorldState(this.conditions);
+        ws.updateWorldStateView();
         return ws;
     }
     SetupWorldState() {
@@ -81,6 +86,61 @@ export class WorldState {
     GetValue(fact: Condition): Condition | undefined {
         return;
     }
+    updateWorldStateView(){
+        const wsdiv = document.getElementById("worldState");
+        if (!wsdiv) {
+            LOGGER.logDev('no wsdiv found');
+            throw new Error('no wsdiv found');
+        }
+        for (let i = 0; i< this.conditions.length; i++) {
+            const e = document.createElement("p");
+            e.textContent = eCondition[this.conditions[i].key].toString();
+            LOGGER.logDev('a ' + eCondition[this.conditions[i].key] + ', ' + eCondition[this.conditions[i].key][0] + ', ' + eCondition[this.conditions[i].key].toString() + ', ' + eCondition[this.conditions[i].key].toString()[0]);
+            switch (eCondition[this.conditions[i].key].toString()[0]){
+                case "b":
+                    LOGGER.logDev('Making a boolean ' + eCondition[this.conditions[i].key]);
+                    const checkboxElement = document.createElement("input");
+                    checkboxElement.type ="checkbox";
+                    checkboxElement.id = eCondition[i];
+                    if (this.conditions[i].value == false) {
+                        checkboxElement.checked = false;
+                    } else if (this.conditions[i].value == true){
+                        checkboxElement.checked = true;
+                    } else {
+                        LOGGER.logDev('WS flagged as boolean incorrectly? ' + eCondition[this.conditions[i].key]);
+                    }
+                    e.appendChild(checkboxElement);
+                    break;
+                case "v":
+                    LOGGER.logDev('Making a vector ' + eCondition[this.conditions[i].key]);
+                    const box1 = document.createElement("input");
+                    const text1 = document.createElement("p");
+                    const box2 = document.createElement("input");
+                    const text2 = document.createElement("p");
+                    const box3 = document.createElement("input");
+                    const text3 = document.createElement("p");
+                    box1.type = "text";
+                    box2.type = "text";
+                    box3.type = "text";
+                    box1.value = "12";
+                    box2.value = "23";
+                    box3.value = "34";
+                    text1.textContent = "x:";
+                    text2.textContent = "y:";
+                    text3.textContent = "z:";
+                    e.append(text1);
+                    e.append(box1);
+                    e.append(text2);
+                    e.append(box2);
+                    e.append(text3);
+                    e.append(box3);
+                    break;
+            }
+            wsdiv.appendChild(e);
+            
+        }
+    }   
+    updateWSFromView(){}
 }
 
 // kato läpi missä on fiksuin paikka millekkin, varsinki ws updateille
