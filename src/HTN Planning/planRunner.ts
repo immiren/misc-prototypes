@@ -7,21 +7,25 @@ export class PlanRunner {
     // public plan: PrimitiveTask[] = [];
 
     ExecutePlan(plan: PrimitiveTask[], worldState: WorldState) {
-        console.log('plan len ' + plan.length);
+        LOGGER.logDev('PLAN EXECUTION START -----------------');
+        LOGGER.logDev('plan len ' + plan.length);
         for(const task of plan) {
             if (worldState.CheckConditions(task.GetPreconditions())) {
                 const result = task.Execute();
                 if(result === TaskResult.SUCCESS) task.ApplyEffects(worldState);
                 else if (result === TaskResult.FAILURE) {
-                    LOGGER.logDev('Failed task ' + task.name);
+                    LOGGER.logDev('FAIL Failed task ' + task.name);
+                    LOGGER.logDev('PLAN EXECUTION END -----------------');
                     // this.ClearPlan(); // tarviiks tätä ees? missä plan säilytetää
                     return;
                 }
             } else {
-                LOGGER.logDev('Conditions unmet at task ' + task.name);
+                LOGGER.logDev('FAIL Conditions unmet at task ' + task.name);
+                LOGGER.logDev('PLAN EXECUTION END -----------------');
                 return;
             }
         }
+        LOGGER.logDev('PLAN EXECUTION END -----------------');
     }
     ClearPlan() { }
     SetPlan() { }

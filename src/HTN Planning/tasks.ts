@@ -21,7 +21,7 @@ export class BaseTask {}
 export class PrimitiveTask extends BaseTask {
     public readonly name: string;
     private preconditions: Condition[] = [];
-    private effects: Condition[] = [];
+    public readonly effects: Condition[] = [];
     private onExecute: () => TaskResult;
     private message: string;
     constructor(name: string, preconditions: Condition[], effects: Condition[], message: string, onExecute: () =>TaskResult) {
@@ -34,6 +34,8 @@ export class PrimitiveTask extends BaseTask {
     }
     IsAvailable(worldState: WorldState): boolean { return worldState.CheckConditions(this.preconditions); }
     // huom: applyeffects, pitäiskö tämmöstä ees olla oikeesti? tai tää oli planning exclusive funktio
+    // VAI tarviiks tälle omaa funktioo ees? jos tää on planning only nii voisko ton WS update kutsuu ilman tätä
+    // req ois se et ois effects getter tai effects ois public(public readonly?)
     ApplyEffects(worldState: WorldState) { worldState.UpdateWorldState(this.effects); }
     Execute(): TaskResult { 
         LOGGER.logDev('Executing task ' + this.name);

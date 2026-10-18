@@ -1,3 +1,4 @@
+import { LOGGER } from "..";
 import { CompoundTask, Method, PrimitiveTask } from "./tasks";
 import { WorldState } from "./worldState";
 
@@ -11,13 +12,16 @@ export class Planner {
         this.activeWorldState = worldState;
     }
     Plan(worldState: WorldState): PrimitiveTask[] {
+        LOGGER.logDev('PLANNING START -----------------');
         this.InitialiseCurrentWorkingState(worldState);
         const decomposedPlan = this.DecomposeCompoundTask(this.rootTask);
         if (decomposedPlan.length > 0) {
-            console.log('planning succesful. plan length ' + decomposedPlan.length);
+            LOGGER.logDev('planning succesful. plan length ' + decomposedPlan.length);
+            LOGGER.logDev('PLANNING END -----------------');
             return decomposedPlan;
         } else {
-            console.log('planning failed.');
+            LOGGER.logDev('planning failed.');
+            LOGGER.logDev('PLANNING END -----------------');
             return [];
         }
     }
@@ -26,59 +30,107 @@ export class Planner {
      * @param task to be decomposed
      * @returns list of tasks or an empty list if no valid plan was found
      */
-    DecomposeCompoundTask(task: CompoundTask): PrimitiveTask[] { 
-        console.log('decomposeCompoundTask');
+    DecomposeCompoundTask(task: CompoundTask): PrimitiveTask[] {
+        LOGGER.logDev('decomposeCompoundTask');
         // miten world state updates täs
         const methods = task.GetMethods();
-        const decomposedTasks: PrimitiveTask[] = []; // basetask vai primitive
+        const decomposedTasks: PrimitiveTask[] = []; 
         if(methods.length <= 0) {
+            LOGGER.logDev('No methods found in task ' + task);
             throw new Error('No methods found in task ' + task);
         }
 
+        const safeIndex = this.SaveCurrentWorkingState();
+
         // ettii yhen sopivan -> eteenpäi kunnes returns plan
         for(const method of methods) {
-            console.log('assessing method');
+            LOGGER.logDev('assessing method');
             const tasks = this.DecomposeMethodTasks(method);
             if (tasks.length > 0) {
                 decomposedTasks.push(...tasks);
                 break;
             }
         }
+        if (decomposedTasks.length === 0 ){
+            LOGGER.logDev('DCT No tasks received. Returning to WSS index ' + safeIndex);
+            this.RestorePreviousWorkingState(safeIndex);
+        }
         return decomposedTasks;
     }
     
     // toimii jos kaikki toimii -> jokasen compound task täytyy return jotai
     DecomposeMethodTasks(method: Method): PrimitiveTask[] 
-     // primitive vs base task?
         {
-            console.log('decomposeMethodTasks');
+            LOGGER.logDev('decomposeMethodTasks');
             const tasks = method.tasks;
             const decomposedTasks: PrimitiveTask[] = [];
             tasks.forEach((task) =>{
                 if (task instanceof CompoundTask){
-                    console.log('compound task');
+                    LOGGER.logDev('compound task');
+                    const safeIndex = this.SaveCurrentWorkingState();
                     const newTasks = this.DecomposeCompoundTask(task);
                     if (newTasks.length > 0) {
+                        LOGGER.logDev('Added ' + newTasks.length + ' tasks');
                         decomposedTasks.push(...newTasks);
                     } else {
                         // onko oikein?
-                        console.warn('no plan made');
+                        LOGGER.logDev('no plan made. returning to WSS index ' + safeIndex);
+                        this.RestorePreviousWorkingState(safeIndex);
                         return [];
                     }
                 } else if (task instanceof PrimitiveTask){
-                    console.log('primitive task');
-                    decomposedTasks.push(task);
+                    LOGGER.logDev('primitive task');
+                    const isAvailable = task.IsAvailable(this.worldStateStack[this.worldStateStack.length-1]);
+                    if( isAvailable) {
+                        LOGGER.logDev('Adding task ' + task.name + ' to plan');
+                        // vertaa tää vs applyeffects
+                        this.worldStateStack[this.worldStateStack.length-1].UpdateWorldState(task.effects);
+                        // task.ApplyEffects(this.worldStateStack[this.worldStateStack.length-1]); // kertaa onks tää fiksu rakenne
+                        decomposedTasks.push(task);
+                    } else {
+                        LOGGER.logDev('Task ' + task.name + ' unavailable.');
+                        return [];
+                    }
                 }
             })
          return decomposedTasks;
         }
-    InitialiseCurrentWorkingState(worldState: WorldState) {
+    InitialiseCurrentWorkingState(initialWorldState: WorldState) {
         this.worldStateStack.length = 0;
-        // this.worldStateStack.pop(worldState.GetCopyOfWorldState());
+        this.worldStateStack.push(initialWorldState.GetCopyOfWorldState());
     }
-    RestorePreviousWorkingState() { }
-    SaveCurrentWorkingState() { }
-    GetCopyOfCurrentWorkingState() { }
+    RestorePreviousWorkingState(safeIndex: number) {
+        const targetLength = safeIndex + 1;
+        let steps = this.worldStateStack.length -targetLength;
+        LOGGER.logDev('Returning WSS to index ' + safeIndex + '. WSS len ' + this.worldStateStack.length + ', target len ' + targetLength + ' req steps ' + steps);
+        if (steps <= 0) {
+            LOGGER.logDev('Incorrect target & WSS lengths. ' + steps + ' steps.');
+            throw new Error('Incorrect target & WSS lengths. ' + steps + ' steps.');
+        }
+
+        for (let i = 0; i < steps; i++){
+            LOGGER.logDev('Step ' + i + '/' + steps + ' of WSS backtracking');
+            const ws = this.worldStateStack.pop()
+            if(!ws) {
+                LOGGER.logDev('WSS ran out of steps at ' + i);
+                throw new Error('WSS ran out of steps at ' + i);
+            }
+        }
+        if (this.worldStateStack.length === targetLength) {
+            LOGGER.logDev('WSS successfully restored to index ' + (this.worldStateStack.length -1));
+        }
+    }
+    /**
+     * Makes copy of most recent world state
+     * @returns index of new working state
+     */
+    SaveCurrentWorkingState(): number {
+        const newWS = this.worldStateStack[this.worldStateStack.length-1].GetCopyOfWorldState();
+        this.worldStateStack.push(newWS);
+        LOGGER.logDev('Pushed entry to WSS. Length: ' + this.worldStateStack.length);
+        return this.worldStateStack.length -1;
+    }
+    GetCopyOfCurrentWorkingState() { } // ei varmaan tartte?
     // DomainSetup() {}
     RemoveWorkingState() { }
     GetIndexOfSafeWorldState() { }

@@ -22,7 +22,12 @@ export type Condition = {
 export class WorldState {
     private conditions: Condition[] = [];
     constructor(facts?: Condition[]){
+        // HUOM janky. varmista et nää on järjestyksessä,,,,,,
         this.conditions = [
+            {
+                key: eCondition.vTargetLocation,
+                value: facts ? facts[eCondition.vTargetLocation].value : null
+            },
             {
                 key: eCondition.bSeesTarget,
                 value: facts ? facts[eCondition.bSeesTarget].value : false
@@ -30,27 +35,24 @@ export class WorldState {
             {
                 key: eCondition.bTestValue,
                 value: facts ? facts[eCondition.bTestValue].value : false
-            },
-            {
-                key: eCondition.vTargetLocation,
-                value: facts ? facts[eCondition.vTargetLocation].value : null
             }
         ];
         LOGGER.logDev('constructing ws');
         this.conditions.forEach((c) => {
-            LOGGER.logDev(c.key + ': ' + c.value);
+            LOGGER.logDev(eCondition[c.key] + ': ' + c.value);
         })
     }
     CheckConditions(preconditions: Condition[]): boolean {
         for (const precondition of preconditions) {
-            LOGGER.logDev('Checking if ' + precondition.key + ' is ' + precondition.value);
-            const condition = this.conditions[precondition.key];
-            LOGGER.logDev('Condition ' + condition.key + ' is ' + condition.value);
-            if (!condition) {
-                LOGGER.logDev('Precondition ' + precondition.key + ' not found/unmet.');
+            LOGGER.logDev('Checking if ' + eCondition[precondition.key] + ' is ' + precondition.value);
+            const condition = this.conditions[precondition.key]; // jos ei toimi nii tarkista conditions järkkä................
+            LOGGER.logDev('CHECK is ' + eCondition[condition.key] + ' = ' + eCondition[precondition.key]);
+            LOGGER.logDev('Condition ' + eCondition[condition.key] + ' is ' + condition.value);
+            if (!condition || condition.value !== precondition.value) {
+                LOGGER.logDev('Precondition ' + eCondition[precondition.key] + ' not found/unmet.');
                 return false;
             }
-            LOGGER.logDev('Precondition ' + precondition.key + ' met.');
+            LOGGER.logDev('Precondition ' + eCondition[precondition.key] + ' met.');
         }
         LOGGER.logDev('All ' + preconditions.length + ' conditions met.');
         return true; }
@@ -58,11 +60,11 @@ export class WorldState {
         for (const fact of facts) {
             const condition = this.conditions[fact.key];
             if (!condition) {
-                LOGGER.logDev('Condition ' + fact.key + ' not found in world state');
+                LOGGER.logDev('Condition ' + eCondition[fact.key] + ' not found in world state');
                 continue;
             }
 
-            LOGGER.logDev('Updating ' + fact.key + ' from ' + condition.value + ' to ' + fact.value);
+            LOGGER.logDev('Updating ' + eCondition[fact.key] + ' from ' + condition.value + ' to ' + fact.value);
             // shallow copy: world state ei varmana päivity :(
             this.conditions[fact.key] = fact;
             // TODO html update
@@ -71,8 +73,7 @@ export class WorldState {
     GetWorldState(): Condition[] { return this.conditions; }
     GetCopyOfWorldState(): WorldState {
         LOGGER.logDev('Copying WS');
-        const ws = new WorldState();
-        ws.UpdateWorldState(this.conditions);
+        const ws = new WorldState(this.conditions);
         return ws;
     }
     SetupWorldState() {
