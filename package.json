@@ -1,13 +1,20 @@
 {
   "name": "NPCProject",
-  "packageManager": "yarn@4.9.1",
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon --watch src --ext ts,html --exec \"npm run build\""
+    "dev": "nodemon --watch src --ext ts,html --exec \"npm run build\"",
+    "tempdev": "webpack -c \"./webpack.config.ts\""
   },
   "devDependencies": {
     "nodemon": "^3.1.14",
     "tsx": "^4.23.15",
-    "typescript": "^5.8.3"
-  }
+    "typescript": "^5.8.3",
+    "webpack": "^5.112.0"
+  },
+  "dependencies": {
+    "@types/node": "^26.6.5",
+    "ts-loader": "^9.6.2",
+    "webpack-cli": "^7.2.3"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
