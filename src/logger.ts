@@ -1,6 +1,8 @@
 export class Logger {
-    private  taskLogElement: HTMLElement;
+    private taskLogElement: HTMLElement;
     private devLogElement: HTMLElement; //rename
+    private devLogCount = 0;
+    private taskLogCount = 0;
     constructor() {
         const tle = document.getElementById('taskLog');
         const dle = document.getElementById('devLog');
@@ -10,11 +12,13 @@ export class Logger {
         this.devLogElement = dle;
     }
     public logTask(message: string) {
-        console.log('TASK ' + message);
-        this.taskLogElement.innerHTML += message + '<br>'
+        console.log('TASK ' + this.taskLogCount + ' ' + message);
+        this.taskLogElement.innerHTML += this.taskLogCount + ' ' + message + '<br>'
+        this.taskLogCount++;
     }
     public logDev(message: string) {
-        console.log('DEV ' + message);
-        this.devLogElement.innerHTML += message + '<br>'
+        console.log('DEV ' + this.devLogCount + ' ' + message);
+        this.devLogElement.innerHTML += this.devLogCount + ' ' + message + '<br>'
+        this.devLogCount++;
     }
 }
