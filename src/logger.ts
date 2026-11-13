@@ -1,4 +1,4 @@
-export class Logger {
+class Logger {
     private taskLogElement: HTMLElement;
     private devLogElement: HTMLElement; //rename
     private devLogCount = 0;
@@ -22,3 +22,5 @@ export class Logger {
         this.devLogCount++;
     }
 }
+
+export const LOGGER = new Logger();
