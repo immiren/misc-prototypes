@@ -17,8 +17,8 @@ export class PlanRunner {
             LOGGER.logDev('Attempted to execute plan without current task set. returning');
             return;
         }
-        if (!this.currentTaskIndex) {
-            LOGGER.logDev('NO TASK INDEX WITH CURRENT TASK. returning');
+        if (this.currentTaskIndex == null) {
+            LOGGER.logDev('CURRENT TASK INDEX IS NULL. returning');
             return;
         }
 
@@ -30,6 +30,7 @@ export class PlanRunner {
             case TaskResult.SUCCESS:
                 // huom ei tätä lopulliseen versioon! prototype only juttu
                 this.currentTask.ApplyEffects(worldState);
+                this.currentTask.ClearTask();
                 // move to next task 
                 this.updateCurrentTask();
                 break;
@@ -80,12 +81,12 @@ export class PlanRunner {
     }
     SetPlan(newPlan: PrimitiveTask[]) {
         this.plan = newPlan;
-        this.updateCurrentTask(this.plan.length);
+        this.updateCurrentTask();
         LOGGER.logDev('Beginning plan from task ' + this.currentTask?.name + ' at index ' + this.currentTaskIndex);
     }
     HasPlan(): boolean {
         LOGGER.logDev('HasPlan() len ' + this.plan.length + ' current task ' + this.currentTask?.name + ' index ' + this.currentTaskIndex);
-        return (this.plan.length > 0) && !!this.currentTask && !!this.currentTaskIndex;
+        return (this.plan.length > 0) && !!this.currentTask && (this.currentTaskIndex !== null && this.currentTaskIndex >= 0);
     }
 
     /**
@@ -93,20 +94,17 @@ export class PlanRunner {
      * @param planLength provide on set plan only
      * @returns on error/incorrect information
      */
-    private updateCurrentTask(planLength?: number) {
-        let index = planLength ?? this.currentTaskIndex;
-        if (!index) {
-            LOGGER.logDev('No index set for task. plan length ' + this.plan.length + ', old index ' + this.currentTaskIndex);
-            return;
-        }
+    private updateCurrentTask() {
+        let index = this.currentTaskIndex !== null ? this.currentTaskIndex + 1 : 0;
+        LOGGER.logDev('CURR INDEX UPDATE FROM ' + this.currentTaskIndex + ' TO ' + index);
+
         if (this.plan.length <= 0) {
             LOGGER.logDev('Invalid plan length ' + this.plan.length);
             return;
         }
-        index--;
-
         if (index >= this.plan.length) {
-            LOGGER.logDev('Given index exceedes plan array. Index: ' + index + ' plan length ' + this.plan.length);
+            LOGGER.logDev('Plan complete. Exceeding index: ' + index + ' plan length ' + this.plan.length);
+            this.ClearPlan();
             return;
         }
         if (index < 0) {
@@ -114,6 +112,10 @@ export class PlanRunner {
             return;
         }
 
+        // if (this.currentTask !== null) LOGGER.logDev('CURR TASK UPDATE FROM ' + this.currentTask.name + ' TO ' + this.plan[index].name);
+        // else LOGGER.logDev('CURR TASK UPDATE FROM undefined task TO ' + this.plan[index].name);
+
+        this.currentTaskIndex = index;
         this.currentTask = this.plan[index];
 
         if (!this.currentTask) {
