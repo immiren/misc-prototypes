@@ -60,16 +60,16 @@ export class WorldState {
      */
     CheckConditions(preconditions: Condition[]): boolean {
         for (const precondition of preconditions) {
-            LOGGER.logDev('Checking if ' + eCondition[precondition.key] + ' is ' + precondition.value);
+            // LOGGER.logDev('Checking if ' + eCondition[precondition.key] + ' is ' + precondition.value);
             const condition = this.conditions[precondition.key]; // jos ei toimi nii tarkista conditions järkkä................
-            LOGGER.logDev('CHECK is ' + eCondition[condition.key] + ' = ' + eCondition[precondition.key]);
-            LOGGER.logDev('Condition ' + eCondition[condition.key] + ' is ' + condition.value);
+            // LOGGER.logDev('CHECK is ' + eCondition[condition.key] + ' = ' + eCondition[precondition.key]);
+            // LOGGER.logDev('Condition ' + eCondition[condition.key] + ' is ' + condition.value);
 
             if (!condition || condition.value !== precondition.value) {
-                LOGGER.logDev('Precondition ' + eCondition[precondition.key] + ' not found/unmet.');
+                LOGGER.logDev('Precondition ' + eCondition[precondition.key] + ' = ' + condition.value + ' not found/unmet.');
                 return false;
             }
-            LOGGER.logDev('Precondition ' + eCondition[precondition.key] + ' met.');
+            LOGGER.logDev('Precondition ' + eCondition[precondition.key] + ' = ' + condition.value + ' met.');
         }
         LOGGER.logDev('All ' + preconditions.length + ' conditions met.');
         return true;
