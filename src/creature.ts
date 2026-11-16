@@ -18,7 +18,7 @@ export class Creature {
     }
     // tick vai update vai
     public Tick() {
-        LOGGER.logDev('TICK --------------------')
+        LOGGER.logDev('TICK START --------------------')
         // World State Update
         // huom! tää saattaa olla turha, tutki miten toimii
         // const WSUpdates = this.worldState.GetWorldStateUpdates();
@@ -34,6 +34,7 @@ export class Creature {
         // sen täytyy myös track näitä ja palauttaa relevant conditions
 
         // Planning Phase
+        LOGGER.logDev('checking if there is need for a new plan');
         if (!this.planRunner.HasPlan()) {
             const newPlan = this.planner.Plan(this.worldState);
             // set plan
@@ -43,5 +44,6 @@ export class Creature {
         // Plan Execution Phase
         // executePlan()
         this.planRunner.ExecutePlan(this.worldState);
+        LOGGER.logDev('TICK END --------------------')
     }
 }

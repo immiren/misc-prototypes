@@ -9,6 +9,7 @@ export class PlanRunner {
     private plan: PrimitiveTask[] = [];
 
     ExecutePlan(worldState: WorldState) {
+        LOGGER.logDev('EXECUTE PLAN -----------------');
         if (!this.HasPlan()) {
             LOGGER.logDev('Attempted to execute plan without plan set. returning');
             return;
@@ -22,6 +23,7 @@ export class PlanRunner {
             return;
         }
 
+        LOGGER.logDev('checking task ' + this.currentTask.name + ' availability');
         if (!this.currentTask.IsAvailable(worldState)) {
             LOGGER.logDev('Task ' + this.currentTask.name + ' unavailable. Clearing plan.');
         }
@@ -31,7 +33,7 @@ export class PlanRunner {
                 // huom ei tätä lopulliseen versioon! prototype only juttu
                 this.currentTask.ApplyEffects(worldState);
                 this.currentTask.ClearTask();
-                // move to next task 
+                // move to next task
                 this.updateCurrentTask();
                 break;
             case TaskResult.WAITING:

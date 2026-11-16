@@ -14,7 +14,7 @@ export function domain(): CompoundTask {
     [{
       key: eCondition.bTestValue,
       value: true
-    }, { key: eCondition.bSeesTarget, value: false }], [{ key: eCondition.bTestValue, value: false }],
+    }/*, { key: eCondition.bSeesTarget, value: false }*/], [{ key: eCondition.bTestValue, value: false }],
     () => {
       if (task1Counter != 2) {
         LOGGER.logTask('Task round ' + task1Counter + '/3. Waiting.');

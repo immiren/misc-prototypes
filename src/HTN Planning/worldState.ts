@@ -31,7 +31,7 @@ export class WorldState {
 
     constructor(facts?: Condition[]) {
         // HUOM janky. varmista et nää on järjestyksessä,,,,,,
-        LOGGER.logDev('constructing ws');
+        // LOGGER.logDev('constructing ws');
 
         this.conditions = [
             {
@@ -48,9 +48,9 @@ export class WorldState {
             }
         ];
 
-        this.conditions.forEach((c) => {
-            LOGGER.logDev('Added condition ' + eCondition[c.key] + ': ' + c.value);
-        })
+        // this.conditions.forEach((c) => {
+        //     LOGGER.logDev('Added condition ' + eCondition[c.key] + ': ' + c.value);
+        // })
     }
 
     /**
